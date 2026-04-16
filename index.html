@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Numbers & Comparison</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Navbar / Header -->
+    <header class="app-header glass">
+      <div class="logo">
+        <span class="logo-icon">✨</span>
+        <span class="logo-text">Numbers<span class="hl">Master</span></span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="mastery-progress" style="width: 0%"></div>
+      </div>
+      <button class="btn btn-icon" id="btn-home" title="Home">🏠</button>
+    </header>
+
+    <main class="main-content">
+      <!-- DASHBOARD VIEW -->
+      <section id="view-dashboard" class="view active">
+        <div class="hero glass-panel">
+          <h1>Module 1: <span class="gradient-text">Numbers and Comparison</span></h1>
+          <p>Master your primary math foundations through interactive visual learning!</p>
+        </div>
+        
+        <div class="topics-grid" id="topics-grid">
+          <!-- Will be injected by JS -->
+        </div>
+      </section>
+
+      <!-- LESSON VIEW -->
+      <section id="view-lesson" class="view">
+        <div class="lesson-header glass">
+          <button class="btn btn-back" id="btn-back">← Back</button>
+          <h2 id="lesson-title">Topic Name</h2>
+          <div class="lesson-score">🎯 <span id="lesson-score-val">0</span>/5</div>
+        </div>
+
+        <div class="lesson-container">
+          <!-- LEARNING PHASE -->
+          <div id="phase-learning" class="phase-card glass animate-slide-up">
+            <div class="phase-badge badge-learning">📖 Learn First</div>
+            <h3 id="learn-subtitle">Concept Intro</h3>
+            <div class="visual-area" id="learn-visual"></div>
+            <div class="text-area" id="learn-text"></div>
+            <button class="btn btn-primary btn-large btn-glow" id="btn-understood">I Understand ✓</button>
+          </div>
+
+          <!-- TASK PHASE -->
+          <div id="phase-task" class="phase-card glass animate-slide-up" style="display:none;">
+            <div class="phase-badge badge-task">✏️ Practice</div>
+            <div class="task-question" id="task-question"></div>
+            <div class="visual-area" id="task-visual"></div>
+            
+            <div class="answer-area" id="task-answers"></div>
+          </div>
+        </div>
+
+      </section>
+      
+      <!-- COMPLETION OVERLAY -->
+      <div class="modal-overlay" id="modal-completion" style="display:none;">
+        <div class="modal glass animate-pop">
+           <div class="modal-icon">🎉</div>
+           <h2>Topic Mastered!</h2>
+           <p>You've completed <span id="completed-topic-name"></span></p>
+           <button class="btn btn-primary" id="btn-next-topic">Continue</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
