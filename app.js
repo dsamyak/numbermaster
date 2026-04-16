@@ -20,7 +20,7 @@ let state = {
    RICH SVG VISUALS 
    ======================================================= */
 const SVG = {
-  tally(n) {
+  tally(n, showTotal=true) {
     let svg = `<svg viewBox="0 0 400 150" width="100%" height="200" style="background:rgba(255,255,255,0.02); border-radius:12px;">`;
     let xOffset = 20;
     
@@ -42,12 +42,14 @@ const SVG = {
     }
     
     // Add text label below
-    svg += `<text x="200" y="140" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Outfit">Total: ${n}</text>`;
+    if (showTotal) {
+      svg += `<text x="200" y="140" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Outfit">Total: ${n}</text>`;
+    }
     svg += `</svg>`;
     return svg;
   },
 
-  numberLine(min, max, highlights=[], showHop=false) {
+  numberLine(min, max, highlights=[], showHop=false, hiddenValue=null) {
     const w = 600, h = 200, pad = 40;
     const lineY = 120;
     const range = max - min;
@@ -63,7 +65,11 @@ const SVG = {
         const thick = hl ? 4 : 2;
         
         svg += `<line x1="${x}" y1="${lineY-10}" x2="${x}" y2="${lineY+10}" stroke="#94a3b8" stroke-width="${thick}"/>`;
-        svg += `<text x="${x}" y="${lineY+35}" text-anchor="middle" fill="${color}" font-weight="${hl?'bold':'normal'}" font-size="18" font-family="Outfit">${i}</text>`;
+        if (i === hiddenValue) {
+            svg += `<text x="${x}" y="${lineY+35}" text-anchor="middle" fill="${color}" font-weight="${hl?'bold':'normal'}" font-size="24" font-family="Outfit">🐸</text>`;
+        } else {
+            svg += `<text x="${x}" y="${lineY+35}" text-anchor="middle" fill="${color}" font-weight="${hl?'bold':'normal'}" font-size="18" font-family="Outfit">${i}</text>`;
+        }
         
         if (hl && showHop === false) {
            svg += `<circle cx="${x}" cy="${lineY}" r="8" fill="#f59e0b">
@@ -91,7 +97,7 @@ const SVG = {
     return svg;
   },
 
-  base10(tens, ones) {
+  base10(tens, ones, showLabels=true) {
     let svg = `<svg viewBox="0 0 400 250" width="100%" height="250" style="background:rgba(255,255,255,0.02); border-radius:12px;">`;
     
     let xOffset = 50;
@@ -121,8 +127,10 @@ const SVG = {
     }
 
     // Labels
-    svg += `<text x="${40 + (tens*25)/2}" y="220" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Outfit">${tens} Tens</text>`;
-    svg += `<text x="${xOffset + 40}" y="220" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Outfit">${ones} Ones</text>`;
+    if(showLabels) {
+      svg += `<text x="${40 + (tens*25)/2}" y="220" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Outfit">${tens} Tens</text>`;
+      svg += `<text x="${xOffset + 40}" y="220" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Outfit">${ones} Ones</text>`;
+    }
     
     svg += `</svg>`;
     return svg;
@@ -209,17 +217,38 @@ const Generators = {
     return [
       {
         isLearning: true, 
-        title: 'History of M: Tally Marks',
+        title: 'History of Math: Tally Marks',
         text: `Before finding digits (0, 1, 2, 3), people used <span class="highlight-text">Tally Marks</span>. For every item, they drew a line. After 4 lines, a diagonal line makes a group of 5!`,
         visual: SVG.tally(13)
       },
-      ...Array.from({length: 4}, () => {
-        const n = Math.floor(Math.random() * 15) + 3;
+      {
+        isLearning: true, 
+        title: 'How to count quickly',
+        text: `See how easy it is to count by 5s? Below we have two full groups of 5. That makes 10!`,
+        visual: SVG.tally(10)
+      },
+      ...Array.from({length: 3}, () => {
+        const n = Math.floor(Math.random() * 8) + 3; // 3 to 10
         return {
           q: 'Count the tally marks below:',
-          visual: SVG.tally(n),
+          visual: SVG.tally(n, false),
           ans: n,
-          choices: [n, n+1, n-2>0?n-2:n+3, n+5].sort(()=>Math.random()-0.5)
+          choices: [n, n+1, n-2>0?n-2:n+3, n+5].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4).sort(()=>Math.random()-0.5)
+        };
+      }),
+      {
+        isLearning: true, 
+        title: 'Building Larger Numbers',
+        text: `We can keep adding groups of 5 to make even bigger numbers! If we have three groups of 5, that's 15. Plus 4 more is 19.`,
+        visual: SVG.tally(19)
+      },
+      ...Array.from({length: 3}, () => {
+        const n = Math.floor(Math.random() * 10) + 11; // 11 to 20
+        return {
+          q: 'Count the tally marks below:',
+          visual: SVG.tally(n, false),
+          ans: n,
+          choices: [n, n+2, n-2>0?n-2:n+3, n+5].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4).sort(()=>Math.random()-0.5)
         };
       })
     ];
@@ -232,12 +261,35 @@ const Generators = {
         text: `The <span class="highlight-text">Number Line</span> is a ruler for math! Moving right means numbers get BIGGER. Moving left means they get smaller. Let's trace the frog's jump!`,
         visual: SVG.numberLine(0, 10, [2, 7], true)
       },
-      ...Array.from({length: 4}, () => {
-        const max = Math.floor(Math.random()*10)+5;
-        const target = Math.floor(Math.random()*max);
+      {
+        isLearning: true, 
+        title: 'Forward Jumping',
+        text: `If we start at 3 and jump forward 4 steps, we land on 7! Watch the frog track the steps.`,
+        visual: SVG.numberLine(0, 10, [3, 7], true)
+      },
+      ...Array.from({length: 3}, () => {
+        const max = 10;
+        const target = Math.floor(Math.random()*(max-1))+1;
         return {
           q: 'Which number is hidden by the frog?',
-          visual: SVG.numberLine(0, max, [target-1, target+1], false).replace('>?</text>', '>🐸</text>'),
+          visual: SVG.numberLine(0, max, [], false, target),
+          ans: target,
+          choices: [target, target+1, target-1, target+2].sort(()=>Math.random()-0.5)
+        };
+      }),
+      {
+        isLearning: true, 
+        title: 'Longer Lines',
+        text: `The number line can go on forever! Let's look at a line from 10 to 20. The frog is jumping from 12 to 18!`,
+        visual: SVG.numberLine(10, 20, [12, 18], true)
+      },
+      ...Array.from({length: 3}, () => {
+        const min = Math.floor(Math.random()*10)*10; // 0, 10, 20
+        const max = min + 10;
+        const target = Math.floor(Math.random()*(max-min-1))+min+1;
+        return {
+          q: 'Which number is hidden by the frog?',
+          visual: SVG.numberLine(min, max, [], false, target),
           ans: target,
           choices: [target, target+1, target-1, target+2].sort(()=>Math.random()-0.5)
         };
@@ -252,42 +304,97 @@ const Generators = {
         text: `Big numbers are assembled from smaller parts. A <span class="highlight-text">Ten block</span> is a stack of 10 ones. The Ones are leftover blocks. What happens when we stack them?`,
         visual: SVG.base10(3, 4)
       },
-      ...Array.from({length: 4}, () => {
-        const t = Math.floor(Math.random()*9)+1;
+      {
+        isLearning: true, 
+        title: 'Breaking down a number',
+        text: `The number 23 has a 2 in the Tens place, and a 3 in the Ones place. That means 2 stacks of Ten, and 3 little One blocks!`,
+        visual: SVG.base10(2, 3)
+      },
+      ...Array.from({length: 3}, () => {
+        const t = Math.floor(Math.random()*2)+1; // 1 to 2
         const o = Math.floor(Math.random()*9);
         const target = t*10+o;
         return {
           q: `Count the Tens and Ones. What is the total number?`,
-          visual: SVG.base10(t, o),
+          visual: SVG.base10(t, o, false),
           ans: target,
-          choices: [target, target+10, t+o, o*10+t].sort(()=>Math.random()-0.5)
+          choices: [target, target+10, t+o, o*10+t].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4).sort(()=>Math.random()-0.5)
+        };
+      }),
+      {
+        isLearning: true, 
+        title: 'Zero Ones!',
+        text: `What happens if we have 4 Tens but ZERO Ones? The number is exactly 40. The zero holds the empty place!`,
+        visual: SVG.base10(4, 0)
+      },
+      ...Array.from({length: 3}, () => {
+        const t = Math.floor(Math.random()*6)+3; // 3 to 8
+        const o = Math.floor(Math.random()*10);
+        const target = t*10+o;
+        return {
+          q: `Count the Tens and Ones. What is the total number?`,
+          visual: SVG.base10(t, o, false),
+          ans: target,
+          choices: [target, target+10, t+o, o*10+t, target+1].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4).sort(()=>Math.random()-0.5)
         };
       })
     ];
   },
   t4() { // Missing Numbers
+    const getBridgeSVG = (nums, rule) => {
+        let svg = `<svg viewBox="0 0 500 150" width="100%" height="200" style="background:rgba(255,255,255,0.02)">
+             <path d="M50 70 Q 150 20 250 70 T 450 70" fill="none" stroke="#06b6d4" stroke-width="4" stroke-dasharray="8 4"/>`;
+        const xPos = [50, 150, 250, 350, 450];
+        const yPos = [70, 45, 70, 45, 70];
+        nums.forEach((n, i) => {
+           let col = n === '?' ? '#f59e0b' : '#7c3aed';
+           svg += `<circle cx="${xPos[i]}" cy="${yPos[i]}" r="20" fill="${col}"/><text x="${xPos[i]}" y="${yPos[i]+5}" text-anchor="middle" fill="#fff" font-weight="bold">${n}</text>`;
+        });
+        if(rule) svg += `<text x="250" y="130" text-anchor="middle" fill="#94a3b8" font-size="16">${rule}</text>`;
+        svg += `</svg>`;
+        return svg;
+    };
     return [
       {
         isLearning: true, 
         title: 'Finding the Pattern Bridge',
         text: `A <span class="highlight-text">number pattern</span> is a sequence of numbers that follow a specific rule (like skip counting by 2s or 5s). Follow the bridge to find the gap!`,
-        visual: `
-          <svg viewBox="0 0 500 150" width="100%" height="200" style="background:rgba(255,255,255,0.02)">
-             <path d="M50 70 Q 150 20 250 70 T 450 70" fill="none" stroke="#06b6d4" stroke-width="4" stroke-dasharray="8 4"/>
-             <circle cx="50" cy="70" r="20" fill="#7c3aed"/><text x="50" y="75" text-anchor="middle" fill="#fff" font-weight="bold">5</text>
-             <circle cx="150" cy="45" r="20" fill="#7c3aed"/><text x="150" y="50" text-anchor="middle" fill="#fff" font-weight="bold">10</text>
-             <circle cx="250" cy="70" r="20" fill="#f59e0b"/><text x="250" y="75" text-anchor="middle" fill="#fff" font-weight="bold">?</text>
-             <circle cx="350" cy="45" r="20" fill="#7c3aed"/><text x="350" y="50" text-anchor="middle" fill="#fff" font-weight="bold">20</text>
-             <circle cx="450" cy="70" r="20" fill="#7c3aed"/><text x="450" y="75" text-anchor="middle" fill="#fff" font-weight="bold">25</text>
-             <text x="250" y="120" text-anchor="middle" fill="#94a3b8" font-size="16">Rule: +5 every jump. The missing value is 15!</text>
-          </svg>
-        `
+        visual: getBridgeSVG([5, 10, '?', 20, 25], "Rule: +5 every jump. The missing value is 15!")
       },
-      ...Array.from({length: 4}, () => {
-        const step = [2,5,10][Math.floor(Math.random()*3)];
+      {
+        isLearning: true, 
+        title: 'Finding the Rule',
+        text: `To find the rule, look at two numbers touching each other. From 2 to 4 is a jump of +2. So the missing number after 6 must be 6 + 2 = 8!`,
+        visual: getBridgeSVG([2, 4, 6, '?', 10], "Rule: +2 every jump. 6 + 2 = 8")
+      },
+      ...Array.from({length: 3}, () => {
+        const step = [2,3,5][Math.floor(Math.random()*3)];
         const start = Math.floor(Math.random()*5)*step;
         const seq = [start, start+step, start+2*step, start+3*step];
-        const missingIdx = Math.floor(Math.random()*4);
+        const missingIdx = 3; // end
+        const ans = seq[missingIdx];
+        
+        let displaySeq = [...seq];
+        displaySeq[missingIdx] = '?';
+
+        return {
+          q: `Identify the missing number in the sequence:`,
+          visual: `<div style="font-size:3rem; letter-spacing:10px; font-weight:800; font-family:'Outfit'; text-align:center;">${displaySeq.join(', ')}</div>`,
+          ans: ans,
+          choices: [ans, ans+step, ans-step, ans+step*2].sort(()=>Math.random()-0.5)
+        };
+      }),
+      {
+        isLearning: true, 
+        title: 'Gaps in the Middle',
+        text: `Sometimes the missing bridge piece is in the middle. We can use the start of the bridge, or the end of the bridge to find the rule!`,
+        visual: getBridgeSVG([10, 20, '?', 40, 50], "Rule: +10! 20 + 10 = 30.")
+      },
+      ...Array.from({length: 3}, () => {
+        const step = [2,5,10][Math.floor(Math.random()*3)];
+        const start = Math.floor(Math.random()*10)*step+5;
+        const seq = [start, start+step, start+2*step, start+3*step, start+4*step];
+        const missingIdx = Math.floor(Math.random()*3)+1; // 1, 2, or 3
         const ans = seq[missingIdx];
         
         let displaySeq = [...seq];
@@ -310,10 +417,34 @@ const Generators = {
         text: `We use symbols to weigh amounts:<br><b>></b> (Greater Than) tips heavy on the left.<br><b><</b> (Less Than) tips heavy on the right.<br><b>=</b> (Equal) balances perfectly!`,
         visual: SVG.balance(45, 12, true)
       },
-      ...Array.from({length: 4}, () => {
-        const a = Math.floor(Math.random()*50)+1;
-        let b = Math.floor(Math.random()*50)+1;
+      {
+        isLearning: true, 
+        title: 'The Hungry Symbol',
+        text: `Always remember: the open mouth of the symbol > or < always eats the BIGGER number!<br><b>8 > 3</b> (8 is greater than 3)`,
+        visual: SVG.balance(8, 3, true)
+      },
+      ...Array.from({length: 3}, () => {
+        const a = Math.floor(Math.random()*20)+1;
+        let b = Math.floor(Math.random()*20)+1;
         if(a === b) b += 1;
+        const ans = a > b ? '>' : '<';
+        return {
+          q: `Compare giving the weight scale below:`,
+          visual: SVG.balance(a, b, false),
+          ans: ans,
+          choices: ['>', '<', '=']
+        };
+      }),
+      {
+        isLearning: true, 
+        title: 'Comparing Large Numbers',
+        text: `When comparing large numbers like 82 and 45, look at the Tens place first! 8 Tens is heavier than 4 Tens, so 82 > 45!`,
+        visual: SVG.balance(82, 45, true)
+      },
+      ...Array.from({length: 3}, () => {
+        const a = Math.floor(Math.random()*70)+30;
+        let b = Math.floor(Math.random()*70)+30;
+        if(a === b) b += 5;
         const ans = a > b ? '>' : '<';
         return {
           q: `Compare giving the weight scale below:`,
@@ -332,18 +463,45 @@ const Generators = {
         text: `<span class="highlight-text">Ascending</span> means building blocks up, from Smallest to Largest.<br><span class="highlight-text">Descending</span> means stepping down from Largest to Smallest.`,
         visual: SVG.stairs([12, 34, 45, 80], true)
       },
-      ...Array.from({length: 4}, () => {
-        const isAsc = Math.random() > 0.5;
+      {
+        isLearning: true, 
+        title: 'Small to Large (Ascending)',
+        text: `If we have 50, 10, and 30... The smallest is 10. Then 30. Then 50 is the largest! 10, 30, 50.`,
+        visual: SVG.stairs([10, 30, 50], true)
+      },
+      ...Array.from({length: 3}, () => {
         let nums = [Math.floor(Math.random()*15), Math.floor(Math.random()*15)+15, Math.floor(Math.random()*15)+30];
         let shuffled = [...nums].sort(()=>Math.random()-0.5);
-        let ansArr = isAsc ? [...nums].sort((a,b)=>a-b) : [...nums].sort((a,b)=>b-a);
+        let ansArr = [...nums].sort((a,b)=>a-b);
         let ansStr = ansArr.join(', ');
         
         let distract1 = [...nums].sort(()=>Math.random()-0.5).join(', ');
         let distract2 = [...nums].sort(()=>Math.random()-0.5).join(', ');
         
         return {
-          q: `Sort blocks in <b>${isAsc?'Ascending':'Descending'}</b> order:`,
+          q: `Sort blocks in <b>Ascending</b> order:`,
+          visual: `<div style="font-size:2.5rem; letter-spacing:10px; font-weight:800; text-align:center;">${shuffled.join(' | ')}</div>`,
+          ans: ansStr,
+          choices: [ansStr, ansArr.reverse().join(', '), distract1, distract2].filter((v, i, a) => a.indexOf(v) === i).slice(0,3)
+        };
+      }),
+      {
+        isLearning: true, 
+        title: 'Large to Small (Descending)',
+        text: `Descending is stepping down from the top! If we have 25, 99, 44... The largest is 99, then 44, then 25 at the bottom.`,
+        visual: SVG.stairs([99, 44, 25], false)
+      },
+      ...Array.from({length: 3}, () => {
+        let nums = [Math.floor(Math.random()*20)+5, Math.floor(Math.random()*20)+30, Math.floor(Math.random()*30)+60, Math.floor(Math.random()*20)+100];
+        let shuffled = [...nums].sort(()=>Math.random()-0.5);
+        let ansArr = [...nums].sort((a,b)=>b-a);
+        let ansStr = ansArr.join(', ');
+        
+        let distract1 = [...nums].sort(()=>Math.random()-0.5).join(', ');
+        let distract2 = [...nums].sort(()=>Math.random()-0.5).join(', ');
+        
+        return {
+          q: `Sort blocks in <b>Descending</b> order:`,
           visual: `<div style="font-size:2.5rem; letter-spacing:10px; font-weight:800; text-align:center;">${shuffled.join(' | ')}</div>`,
           ans: ansStr,
           choices: [ansStr, ansArr.reverse().join(', '), distract1, distract2].filter((v, i, a) => a.indexOf(v) === i).slice(0,3)
@@ -363,6 +521,7 @@ const DOM = {
   btnBack: document.getElementById('btn-back'),
   lessonTitle: document.getElementById('lesson-title'),
   scoreVal: document.getElementById('lesson-score-val'),
+  scoreMax: document.getElementById('lesson-score-max'),
   
   phaseLearning: document.getElementById('phase-learning'),
   lSubtitle: document.getElementById('learn-subtitle'),
@@ -427,6 +586,7 @@ function startLesson(topic) {
   
   DOM.lessonTitle.textContent = topic.title;
   DOM.scoreVal.textContent = '0';
+  DOM.scoreMax.textContent = state.topicItems.filter(i => !i.isLearning).length;
   
   navTo('lesson');
   renderCurrentItem();
