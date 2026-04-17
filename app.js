@@ -21,7 +21,7 @@ let state = {
    ======================================================= */
 const SVG = {
   tally(n, showTotal=true) {
-    let svg = `<svg viewBox="0 0 400 150" width="100%" height="200" style="background:rgba(255,255,255,0.02); border-radius:12px;">`;
+    let svg = `<svg viewBox="0 0 400 150" width="100%" height="200" style="background:rgba(0,0,0,0.02); border-radius:12px;">`;
     let xOffset = 20;
     
     for (let count = 1; count <= n; count++) {
@@ -43,7 +43,7 @@ const SVG = {
     
     // Add text label below
     if (showTotal) {
-      svg += `<text x="200" y="140" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Outfit">Total: ${n}</text>`;
+      svg += `<text x="200" y="140" text-anchor="middle" fill="#475569" font-size="16" font-family="Outfit">Total: ${n}</text>`;
     }
     svg += `</svg>`;
     return svg;
@@ -55,16 +55,16 @@ const SVG = {
     const range = max - min;
     const step = (w - pad*2) / range;
     
-    let svg = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="250" style="background:rgba(255,255,255,0.02); border-radius:12px;">`;
-    svg += `<line x1="${pad-20}" y1="${lineY}" x2="${w-pad+20}" y2="${lineY}" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>`;
+    let svg = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="250" style="background:rgba(0,0,0,0.02); border-radius:12px;">`;
+    svg += `<line x1="${pad-20}" y1="${lineY}" x2="${w-pad+20}" y2="${lineY}" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>`;
     
     for (let i = min; i <= max; i++) {
         const x = pad + (i - min) * step;
         const hl = highlights.includes(i);
-        const color = hl ? '#f59e0b' : '#f8fafc';
+        const color = hl ? '#d97706' : '#0f172a';
         const thick = hl ? 4 : 2;
         
-        svg += `<line x1="${x}" y1="${lineY-10}" x2="${x}" y2="${lineY+10}" stroke="#94a3b8" stroke-width="${thick}"/>`;
+        svg += `<line x1="${x}" y1="${lineY-10}" x2="${x}" y2="${lineY+10}" stroke="#64748b" stroke-width="${thick}"/>`;
         if (i === hiddenValue) {
             svg += `<text x="${x}" y="${lineY+35}" text-anchor="middle" fill="${color}" font-weight="${hl?'bold':'normal'}" font-size="24" font-family="Outfit">🐸</text>`;
         } else {
@@ -98,7 +98,7 @@ const SVG = {
   },
 
   base10(tens, ones, showLabels=true) {
-    let svg = `<svg viewBox="0 0 400 250" width="100%" height="250" style="background:rgba(255,255,255,0.02); border-radius:12px;">`;
+    let svg = `<svg viewBox="0 0 400 250" width="100%" height="250" style="background:rgba(0,0,0,0.02); border-radius:12px;">`;
     
     let xOffset = 50;
     // TENS (Sticks)
@@ -128,8 +128,8 @@ const SVG = {
 
     // Labels
     if(showLabels) {
-      svg += `<text x="${40 + (tens*25)/2}" y="220" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Outfit">${tens} Tens</text>`;
-      svg += `<text x="${xOffset + 40}" y="220" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Outfit">${ones} Ones</text>`;
+      svg += `<text x="${40 + (tens*25)/2}" y="220" text-anchor="middle" fill="#475569" font-size="16" font-family="Outfit">${tens} Tens</text>`;
+      svg += `<text x="${xOffset + 40}" y="220" text-anchor="middle" fill="#475569" font-size="16" font-family="Outfit">${ones} Ones</text>`;
     }
     
     svg += `</svg>`;
@@ -138,37 +138,66 @@ const SVG = {
 
   balance(leftVal, rightVal, showValue=true) {
     const diff = leftVal - rightVal;
-    const tilt = diff > 0 ? 15 : diff < 0 ? -15 : 0;
     
-    let svg = `<svg viewBox="0 0 500 300" width="100%" height="250" style="background:rgba(255,255,255,0.02); border-radius:12px;">`;
-    const cx = 250, cy = 250;
-    
-    // Scale base and fulcrum
-    svg += `<polygon points="${cx-40},${cy+30} ${cx+40},${cy+30} ${cx},${cy-20}" fill="#475569" />`;
-    svg += `<circle cx="${cx}" cy="${cy-20}" r="8" fill="#f8fafc" />`;
-    
-    // Group holding the animating beam
-    svg += `<g transform="rotate(${tilt}, ${cx}, ${cy-20})" style="transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1)">`;
-    // Beam
-    svg += `<line x1="${cx-150}" y1="${cy-20}" x2="${cx+150}" y2="${cy-20}" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"/>`;
-    
-    // Left Box
-    svg += `<line x1="${cx-150}" y1="${cy-20}" x2="${cx-150}" y2="${cy-100}" stroke="#64748b" stroke-dasharray="4"/>`;
-    svg += `<rect x="${cx-190}" y="${cy-150}" width="80" height="80" rx="12" fill="#7c3aed" opacity="0.9" />`;
-    if(showValue) svg += `<text x="${cx-150}" y="${cy-105}" text-anchor="middle" fill="#fff" font-size="28" font-weight="bold">${leftVal}</text>`;
-    else svg += `<text x="${cx-150}" y="${cy-105}" text-anchor="middle" fill="#fff" font-size="28" font-weight="bold">?</text>`;
-    
-    // Right Box
-    svg += `<line x1="${cx+150}" y1="${cy-20}" x2="${cx+150}" y2="${cy-100}" stroke="#64748b" stroke-dasharray="4"/>`;
-    svg += `<rect x="${cx+110}" y="${cy-150}" width="80" height="80" rx="12" fill="#06b6d4" opacity="0.9" />`;
-    if(showValue) svg += `<text x="${cx+150}" y="${cy-105}" text-anchor="middle" fill="#fff" font-size="28" font-weight="bold">${rightVal}</text>`;
-    else svg += `<text x="${cx+150}" y="${cy-105}" text-anchor="middle" fill="#fff" font-size="28" font-weight="bold">?</text>`;
-    
-    svg += `</g>`;
-    
+    let svg = `<svg viewBox="0 0 500 250" width="100%" height="250" style="background:rgba(0,0,0,0.02); border-radius:12px; overflow:visible;">
+      <style>
+        .group-l { animation: clashMoveL 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .group-r { animation: clashMoveR 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes clashMoveL { 0% { transform: translateX(-150px); } 30%, 100% { transform: translateX(0); } }
+        @keyframes clashMoveR { 0% { transform: translateX(150px); } 30%, 100% { transform: translateX(0); } }
+        
+        .clash-win { animation: clashWinEff 1s forwards; }
+        .clash-lose { animation: clashLoseEff 1s forwards; }
+        .clash-eq { animation: clashEqEff 1s forwards; }
+        
+        @keyframes clashWinEff { 0%, 30% { transform: scale(1); } 40% { transform: scale(1.3); } 100% { transform: scale(1.15); } }
+        @keyframes clashLoseEff { 0%, 30% { transform: scale(1) rotate(0); opacity:1;} 40%, 100% { transform: scale(0.6) rotate(-20deg) translateY(30px); opacity:0.4; filter: grayscale(0.8); } }
+        @keyframes clashEqEff { 0%, 30% { transform: scale(1); } 40% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        .clash-boom { animation: clashBoomEff 1s forwards; }
+        @keyframes clashBoomEff { 0%, 25% { transform: scale(0); opacity: 0; } 35% { transform: scale(1.5); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        
+        .clash-spark { animation: clashSparkEff 1s forwards; }
+        @keyframes clashSparkEff { 0%, 29% { opacity: 0; transform: scale(0); } 30% { opacity: 1; transform: scale(1); } 50%, 100% { opacity: 0; transform: scale(2.5); } }
+      </style>
+      <defs>
+         <filter id="clash-glow" x="-20%" y="-20%" width="140%" height="140%">
+           <feGaussianBlur stdDeviation="5" result="blur" />
+           <feComposite in="SourceGraphic" in2="blur" operator="over" />
+         </filter>
+      </defs>
+    `;
+
+    const leftCls = diff > 0 ? 'clash-win' : diff < 0 ? 'clash-lose' : 'clash-eq';
+    const rightCls = diff < 0 ? 'clash-win' : diff > 0 ? 'clash-lose' : 'clash-eq';
+
+    svg += `<g class="clash-spark" style="transform-origin: 250px 125px;">
+              <circle cx="250" cy="125" r="40" fill="none" stroke="#f59e0b" stroke-width="8" />
+              <polygon points="250,75 260,115 300,125 260,135 250,175 240,135 200,125 240,115" fill="#f59e0b" />
+            </g>`;
+
+    svg += `<g class="group-l">
+              <g class="${leftCls}" style="transform-origin: 180px 125px;">
+                <rect x="130" y="75" width="100" height="100" rx="16" fill="#7c3aed" filter="${diff>0 ? 'url(#clash-glow)' : 'none'}"/>
+                <text x="180" y="140" text-anchor="middle" fill="#fff" font-size="40" font-weight="900" font-family="Outfit">${leftVal}</text>
+              </g>
+            </g>`;
+
+    svg += `<g class="group-r">
+              <g class="${rightCls}" style="transform-origin: 320px 125px;">
+                <rect x="270" y="75" width="100" height="100" rx="16" fill="#06b6d4" filter="${diff<0 ? 'url(#clash-glow)' : 'none'}"/>
+                <text x="320" y="140" text-anchor="middle" fill="#fff" font-size="40" font-weight="900" font-family="Outfit">${rightVal}</text>
+              </g>
+            </g>`;
+
     if (showValue) {
         let sign = diff > 0 ? '>' : diff < 0 ? '<' : '=';
-        svg += `<text x="${cx}" y="80" text-anchor="middle" fill="#f59e0b" font-size="48" font-weight="bold">${sign}</text>`;
+        svg += `<text x="250" y="145" text-anchor="middle" fill="#d97706" font-size="60" font-weight="900" class="clash-boom" style="transform-origin: 250px 125px;">${sign}</text>`;
+    } else {
+        svg += `<g class="clash-boom" style="transform-origin: 250px 125px;">
+                  <circle cx="250" cy="125" r="30" fill="#f8fafc" stroke="#e2e8f0" stroke-width="4"/>
+                  <text x="250" y="137" text-anchor="middle" fill="#94a3b8" font-size="30" font-weight="900">?</text>
+                </g>`;
     }
     
     svg += `</svg>`;
@@ -176,7 +205,7 @@ const SVG = {
   },
 
   stairs(values, isAscending) {
-      let svg = `<svg viewBox="0 0 500 300" width="100%" height="250" style="background:rgba(255,255,255,0.02); border-radius:12px;">`;
+      let svg = `<svg viewBox="0 0 500 300" width="100%" height="250" style="background:rgba(0,0,0,0.02); border-radius:12px;">`;
       
       const maxH = 200;
       const stepW = 60;
@@ -191,7 +220,7 @@ const SVG = {
                      <animate attributeName="y" from="250" to="${yOffset}" dur="0.8s" fill="freeze" begin="${idx*0.2}s" />
                      <animate attributeName="height" from="0" to="${height}" dur="0.8s" fill="freeze" begin="${idx*0.2}s" />
                   </rect>`;
-          svg += `<text x="${xOffset + stepW/2}" y="${yOffset - 10}" text-anchor="middle" fill="#fff" font-size="22" font-weight="bold">${v}</text>`;
+          svg += `<text x="${xOffset + stepW/2}" y="${yOffset - 10}" text-anchor="middle" fill="#0f172a" font-size="22" font-weight="bold">${v}</text>`;
           xOffset += stepW + 10;
       });
 
@@ -212,6 +241,15 @@ const SVG = {
 /* =======================================================
    GENERATORS (Learning Phase + Tasks)
    ======================================================= */
+const shuffle = (array) => {
+  let arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
 const Generators = {
   t1() { // History of Math
     return [
@@ -233,7 +271,8 @@ const Generators = {
           q: 'Count the tally marks below:',
           visual: SVG.tally(n, false),
           ans: n,
-          choices: [n, n+1, n-2>0?n-2:n+3, n+5].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4).sort(()=>Math.random()-0.5)
+          choices: shuffle(Array.from(new Set([n, n+1, n-2>0?n-2:n+3, n+5, n+2, n+4])).slice(0,4)),
+          hint: "Count the vertical lines. A diagonal line crossing them makes a group of 5!"
         };
       }),
       {
@@ -248,7 +287,8 @@ const Generators = {
           q: 'Count the tally marks below:',
           visual: SVG.tally(n, false),
           ans: n,
-          choices: [n, n+2, n-2>0?n-2:n+3, n+5].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4).sort(()=>Math.random()-0.5)
+          choices: shuffle(Array.from(new Set([n, n+2, n-2>0?n-2:n+3, n+5, n-1>0?n-1:n+4, n+1])).slice(0,4)),
+          hint: "Count the vertical lines. A diagonal line crossing them makes a group of 5!"
         };
       })
     ];
@@ -274,7 +314,8 @@ const Generators = {
           q: 'Which number is hidden by the frog?',
           visual: SVG.numberLine(0, max, [], false, target),
           ans: target,
-          choices: [target, target+1, target-1, target+2].sort(()=>Math.random()-0.5)
+          choices: shuffle(Array.from(new Set([target, target+1, target-1<=0?target+3:target-1, target+2, target+4])).slice(0,4)),
+          hint: "Look at the numbers before and after the frog. What comes between them?"
         };
       }),
       {
@@ -291,7 +332,8 @@ const Generators = {
           q: 'Which number is hidden by the frog?',
           visual: SVG.numberLine(min, max, [], false, target),
           ans: target,
-          choices: [target, target+1, target-1, target+2].sort(()=>Math.random()-0.5)
+          choices: shuffle(Array.from(new Set([target, target+1, target-1<0?target+3:target-1, target+2, target+4])).slice(0,4)),
+          hint: "Look at the numbers before and after the frog. What comes right between them?"
         };
       })
     ];
@@ -318,7 +360,8 @@ const Generators = {
           q: `Count the Tens and Ones. What is the total number?`,
           visual: SVG.base10(t, o, false),
           ans: target,
-          choices: [target, target+10, t+o, o*10+t].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4).sort(()=>Math.random()-0.5)
+          choices: shuffle(Array.from(new Set([target, target+10, t+o, o*10+t, target+1, target-1<0?target+5:target-1])).slice(0,4)),
+          hint: "Each purple stack is 10. Each tiny blue block is 1. Count by tens first, then add the ones!"
         };
       }),
       {
@@ -335,14 +378,15 @@ const Generators = {
           q: `Count the Tens and Ones. What is the total number?`,
           visual: SVG.base10(t, o, false),
           ans: target,
-          choices: [target, target+10, t+o, o*10+t, target+1].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4).sort(()=>Math.random()-0.5)
+          choices: shuffle(Array.from(new Set([target, target+10, t+o, o*10+t, target+1, target-1<0?target+5:target-1])).slice(0,4)),
+          hint: "Each purple stack is 10. Each tiny blue block is 1. Count by tens first, then add the ones!"
         };
       })
     ];
   },
   t4() { // Missing Numbers
     const getBridgeSVG = (nums, rule) => {
-        let svg = `<svg viewBox="0 0 500 150" width="100%" height="200" style="background:rgba(255,255,255,0.02)">
+        let svg = `<svg viewBox="0 0 500 150" width="100%" height="200" style="background:rgba(0,0,0,0.02)">
              <path d="M50 70 Q 150 20 250 70 T 450 70" fill="none" stroke="#06b6d4" stroke-width="4" stroke-dasharray="8 4"/>`;
         const xPos = [50, 150, 250, 350, 450];
         const yPos = [70, 45, 70, 45, 70];
@@ -350,7 +394,7 @@ const Generators = {
            let col = n === '?' ? '#f59e0b' : '#7c3aed';
            svg += `<circle cx="${xPos[i]}" cy="${yPos[i]}" r="20" fill="${col}"/><text x="${xPos[i]}" y="${yPos[i]+5}" text-anchor="middle" fill="#fff" font-weight="bold">${n}</text>`;
         });
-        if(rule) svg += `<text x="250" y="130" text-anchor="middle" fill="#94a3b8" font-size="16">${rule}</text>`;
+        if(rule) svg += `<text x="250" y="130" text-anchor="middle" fill="#475569" font-size="16">${rule}</text>`;
         svg += `</svg>`;
         return svg;
     };
@@ -370,8 +414,8 @@ const Generators = {
       ...Array.from({length: 3}, () => {
         const step = [2,3,5][Math.floor(Math.random()*3)];
         const start = Math.floor(Math.random()*5)*step;
-        const seq = [start, start+step, start+2*step, start+3*step];
-        const missingIdx = 3; // end
+        const seq = [start, start+step, start+2*step, start+3*step, start+4*step];
+        const missingIdx = 4; // end
         const ans = seq[missingIdx];
         
         let displaySeq = [...seq];
@@ -379,9 +423,10 @@ const Generators = {
 
         return {
           q: `Identify the missing number in the sequence:`,
-          visual: `<div style="font-size:3rem; letter-spacing:10px; font-weight:800; font-family:'Outfit'; text-align:center;">${displaySeq.join(', ')}</div>`,
+          visual: getBridgeSVG(displaySeq, ""),
           ans: ans,
-          choices: [ans, ans+step, ans-step, ans+step*2].sort(()=>Math.random()-0.5)
+          choices: shuffle(Array.from(new Set([ans, ans+step, ans-step<0?ans+step*3:ans-step, ans+step*2, ans+1])).slice(0,4)),
+          hint: "Find two numbers next to each other to figure out the jumping rule (like +2 or +5)!"
         };
       }),
       {
@@ -402,9 +447,10 @@ const Generators = {
 
         return {
           q: `Identify the missing number in the sequence:`,
-          visual: `<div style="font-size:3rem; letter-spacing:10px; font-weight:800; font-family:'Outfit'; text-align:center;">${displaySeq.join(', ')}</div>`,
+          visual: getBridgeSVG(displaySeq, ""),
           ans: ans,
-          choices: [ans, ans+step, ans-step, ans+step*2].sort(()=>Math.random()-0.5)
+          choices: shuffle(Array.from(new Set([ans, ans+step, ans-step<0?ans+step*3:ans-step, ans+step*2, ans+1])).slice(0,4)),
+          hint: "Find two numbers next to each other to figure out the jumping rule (like +2 or +5)!"
         };
       })
     ];
@@ -413,14 +459,14 @@ const Generators = {
     return [
       {
         isLearning: true, 
-        title: 'The Great Balance Scale',
-        text: `We use symbols to weigh amounts:<br><b>></b> (Greater Than) tips heavy on the left.<br><b><</b> (Less Than) tips heavy on the right.<br><b>=</b> (Equal) balances perfectly!`,
+        title: 'Number Clash!',
+        text: `Numbers can go Head-to-Head! The GREATER number uses its power to grow bigger, while the smaller number is squished! Watch the <span class="highlight-text">Number Clash</span> happen!`,
         visual: SVG.balance(45, 12, true)
       },
       {
         isLearning: true, 
-        title: 'The Hungry Symbol',
-        text: `Always remember: the open mouth of the symbol > or < always eats the BIGGER number!<br><b>8 > 3</b> (8 is greater than 3)`,
+        title: 'The Power Symbol',
+        text: `When they clash, a Power Symbol appears! The wide open mouth always opens towards the winning, BIGGER number!<br><b>8 > 3</b> (8 defeats 3)`,
         visual: SVG.balance(8, 3, true)
       },
       ...Array.from({length: 3}, () => {
@@ -429,16 +475,17 @@ const Generators = {
         if(a === b) b += 1;
         const ans = a > b ? '>' : '<';
         return {
-          q: `Compare giving the weight scale below:`,
+          q: `Compare using the Number Clash below:`,
           visual: SVG.balance(a, b, false),
           ans: ans,
-          choices: ['>', '<', '=']
+          choices: ['>', '<', '='],
+          hint: "Look at the numbers! Which one is bigger? The open mouth always eats the winning BIGGER number!"
         };
       }),
       {
         isLearning: true, 
-        title: 'Comparing Large Numbers',
-        text: `When comparing large numbers like 82 and 45, look at the Tens place first! 8 Tens is heavier than 4 Tens, so 82 > 45!`,
+        title: 'Clashing Large Numbers',
+        text: `When comparing large numbers like 82 and 45, look at the Tens place first! 8 Tens defeats 4 Tens, so 82 > 45!`,
         visual: SVG.balance(82, 45, true)
       },
       ...Array.from({length: 3}, () => {
@@ -447,10 +494,11 @@ const Generators = {
         if(a === b) b += 5;
         const ans = a > b ? '>' : '<';
         return {
-          q: `Compare giving the weight scale below:`,
+          q: `Compare using the Number Clash below:`,
           visual: SVG.balance(a, b, false),
           ans: ans,
-          choices: ['>', '<', '=']
+          choices: ['>', '<', '='],
+          hint: "Look at the numbers! Which one is bigger? The open mouth always eats the winning BIGGER number!"
         };
       })
     ];
@@ -475,14 +523,15 @@ const Generators = {
         let ansArr = [...nums].sort((a,b)=>a-b);
         let ansStr = ansArr.join(', ');
         
-        let distract1 = [...nums].sort(()=>Math.random()-0.5).join(', ');
-        let distract2 = [...nums].sort(()=>Math.random()-0.5).join(', ');
+        let distract1 = shuffle(nums).join(', ');
+        let distract2 = shuffle(nums).join(', ');
         
         return {
           q: `Sort blocks in <b>Ascending</b> order:`,
           visual: `<div style="font-size:2.5rem; letter-spacing:10px; font-weight:800; text-align:center;">${shuffled.join(' | ')}</div>`,
           ans: ansStr,
-          choices: [ansStr, ansArr.reverse().join(', '), distract1, distract2].filter((v, i, a) => a.indexOf(v) === i).slice(0,3)
+          choices: shuffle(Array.from(new Set([ansStr, ansArr.reverse().join(', '), distract1, distract2, shuffle(nums).join(', ')])).slice(0,3)),
+          hint: "Ascending means stepping UP: Small to Large."
         };
       }),
       {
@@ -497,14 +546,15 @@ const Generators = {
         let ansArr = [...nums].sort((a,b)=>b-a);
         let ansStr = ansArr.join(', ');
         
-        let distract1 = [...nums].sort(()=>Math.random()-0.5).join(', ');
-        let distract2 = [...nums].sort(()=>Math.random()-0.5).join(', ');
+        let distract1 = shuffle(nums).join(', ');
+        let distract2 = shuffle(nums).join(', ');
         
         return {
           q: `Sort blocks in <b>Descending</b> order:`,
           visual: `<div style="font-size:2.5rem; letter-spacing:10px; font-weight:800; text-align:center;">${shuffled.join(' | ')}</div>`,
           ans: ansStr,
-          choices: [ansStr, ansArr.reverse().join(', '), distract1, distract2].filter((v, i, a) => a.indexOf(v) === i).slice(0,3)
+          choices: shuffle(Array.from(new Set([ansStr, ansArr.reverse().join(', '), distract1, distract2, shuffle(nums).join(', ')])).slice(0,3)),
+          hint: "Descending means stepping DOWN: Large to Small."
         };
       })
     ];
@@ -533,6 +583,9 @@ const DOM = {
   tQuestion: document.getElementById('task-question'),
   tVisual: document.getElementById('task-visual'),
   tAnswers: document.getElementById('task-answers'),
+  hintContainer: document.getElementById('task-hint-container'),
+  btnShowHint: document.getElementById('btn-show-hint'),
+  hintText: document.getElementById('hint-text'),
   
   modalCompletion: document.getElementById('modal-completion'),
   btnNextTopic: document.getElementById('btn-next-topic'),
@@ -547,6 +600,10 @@ function init() {
   DOM.btnHome.onclick = () => navTo('dashboard');
   DOM.btnBack.onclick = () => navTo('dashboard');
   DOM.btnUnderstood.onclick = () => nextItem();
+  DOM.btnShowHint.onclick = () => {
+    DOM.hintText.style.display = 'block';
+    DOM.btnShowHint.style.display = 'none';
+  };
   DOM.btnNextTopic.onclick = () => { DOM.modalCompletion.style.display = 'none'; navTo('dashboard'); };
 }
 
@@ -621,6 +678,15 @@ function renderCurrentItem() {
 
     DOM.tQuestion.innerHTML = item.q;
     DOM.tVisual.innerHTML = item.visual || '';
+    
+    if (item.hint) {
+      DOM.hintContainer.style.display = 'block';
+      DOM.hintText.style.display = 'none';
+      DOM.hintText.innerHTML = `<strong>Hint:</strong> ${item.hint}`;
+      DOM.btnShowHint.style.display = 'block';
+    } else {
+      DOM.hintContainer.style.display = 'none';
+    }
     
     DOM.tAnswers.innerHTML = '';
     item.choices.forEach(c => {
